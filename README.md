@@ -2,7 +2,7 @@
 ----
 
 使用node构建后台管理系统,其中project文件夹是使用element-ui搭建的前端页面.routine文件夹是node请求接口
-##使用方法
+使用方法
 ----
 + 正常的node项目和vue项目
 + 前端项目使用vuecli3.0版本
