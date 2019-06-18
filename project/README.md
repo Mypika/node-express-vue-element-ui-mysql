@@ -1,29 +1,5 @@
-# ad3.0
+#使用element-ui搭建的一个后台管理系统
 
-## Project setup
-```
-npm install
-```
+## 填写目录页实现对应目标网站的小说抓取，
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 将抓取小说信息储存mysql中
