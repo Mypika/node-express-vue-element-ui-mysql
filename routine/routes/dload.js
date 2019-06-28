@@ -24,16 +24,16 @@ var TxtList = function(tim){
         })
       })
 }
-function dowlds(url,href,name,index,i){
+function dowlds(url,href,name,index,ID){
   axios.get(url+href,{timeout: 10000 * 60 * 5})
   .then(rdata=>{
     let TXT = cheerio.load(rdata.data.toString())
-    let txtbox = TXT(".txt_cont h1").text()+'///'+TXT("#content1").text()+'//////'
-    fs.writeFile('TXT/'+name+'/'+index+TXT(".txt_cont h1").text()+'.txt',txtbox,{flag:'a'},function(err){
+    let txtbox = TXT(".txt_cont h1").text()+'///'+TXT("#content1").text()+'&&'
+    fs.writeFile('TXT/'+ID+'/'+index+'&'+TXT(".txt_cont h1").text()+'.txt',txtbox,{flag:'a'},function(err){
       if(err){
           console.log(err)
       }else{
-          console.log('下载章节'+TXT(".txt_cont h1").text()+'//成功'+1)
+          console.log('下载章节'+TXT(".txt_cont h1").text()+'//成功')
       }
     })
   })
@@ -58,14 +58,14 @@ var TxtLoad = function(url,name,imgurl,brief){
         console.log(bookbrief)
         sqlquery('UPDATE bookList SET book_brief=? WHERE book_name=?',[bookbrief,name])
       }
-      $('.pc_list').each(function(index){
+      $('.pc_list').each(async function(index){
           if(index==1){
-            fs.mkdir('TXT/'+name+'/',{ recursive: true },function(err){
+            let ID =await sqlquery('SELECT id FROM bookList WHERE book_name=?',name)
+            fs.mkdir('TXT/'+ID[0].id+'/',{ recursive: true },function(err){
                 if(err){
                     console.log(err)
                 }else{
-                   console.log(`´´´´´´´´██´´´´´´´
-                   ´´´´´´´████´´´´´´
+                   console.log(`´´´´´´´████´´´´´´
                    ´´´´´████████´´´´
                    ´´´███▒▒▒▒███´´´´´
                    ´´´███▒●▒▒●▒██´´´
@@ -92,7 +92,6 @@ var TxtLoad = function(url,name,imgurl,brief){
                    _________▒▒▒▒
                    _________▒▒▒▒
                    ________▒▒_▒▒
-                   _______▒▒__▒▒
                    _____ ▒▒___▒▒
                    _____▒▒___▒▒
                    ____▒▒____▒▒
@@ -107,22 +106,28 @@ var TxtLoad = function(url,name,imgurl,brief){
           let n =Math.ceil( arr.length/20)
           let i=0
           let timer;
+         try{
           timer = setInterval(()=>{
-              if(i<n){
-                arr.each(function(index){
-                  let href = $(this).find('a').attr('href')
-                   if(index<20*(i+1)&&index>=20*i){
-                    dowlds(url,href,name,index,i)
-                   }else{
-                     return true
-                   }
-                  })
-                  i++
-              }else{
-                console.log('下载完成')
-                clearInterval(timer)
-              }
-            },2000)
+            if(i<n){
+              arr.each(function(index){
+                let href = $(this).find('a').attr('href')
+                 if(index<20*(i+1)&&index>=20*i){
+                  dowlds(url,href,name,index,ID[0].id)
+                 }else{
+                   return true
+                 }
+                })
+                i++
+            }else{
+              sqlquery('UPDATE bookList SET book_state=? WHERE book_name=?',[1,name])
+              console.log('下载完成')
+              clearInterval(timer)
+            }
+          },2000)
+         }
+         catch{
+          sqlquery('UPDATE bookList SET book_state=? WHERE book_name=?',[0,name])
+         }
         }
       })
       reslove('创建抓取任务成功，进入后台下载')
@@ -162,16 +167,16 @@ router.post('/wload',async function(req,res,next){
   if(imgurl==''||imgurl==undefined||imgurl.length<1||imgurl==null){
     imgurl=1;
   }
-  let bodys = [name,imgurl,brief,url]
-  let save = await sqlquery('INSERT INTO bookList (book_name,img_cover,book_brief,book_ssy,book_time) VALUES (?,?,?,?,NOW())',bodys)
+  let bodys = [name,imgurl,brief,url,2]
+  let save = await sqlquery('INSERT INTO bookList (book_name,img_cover,book_brief,book_ssy,book_state,book_time) VALUES (?,?,?,?,?,NOW())',bodys)
   let TxtLoads = TxtLoad(url,name,imgurl,brief)
   TxtLoads.then(resdata=>{
     res.send({
       state:true,
       msg:'创建抓取任务成功，进入后台下载'
     })
+    })
   })
-})
   .catch(err=>{
       console.log('下载地址不可用')
       return res.send({

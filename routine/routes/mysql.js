@@ -2,6 +2,7 @@ const mysqld = require('mysql')
 
 const sqlconfig = {
     host:'47.100.220.190',
+    // host:'localhost',
     user:'admin',
     password:'10291029',
     database:'Book',

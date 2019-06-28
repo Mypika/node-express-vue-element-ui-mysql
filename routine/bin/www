@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('shucheng:server');
 var http = require('http');
+var https = require('https');
+var fs = require('fs')
 
 /**
  * Get port from environment and store in Express.
@@ -18,8 +20,12 @@ app.set('port', port);
 /**
  * Create HTTP server.
  */
-
+const httpsOption = {
+  key : fs.readFileSync("./https/2378901_wxx.takiku.com.key"),
+  cert: fs.readFileSync("./https/2378901_wxx.takiku.com.pem")
+}
 var server = http.createServer(app);
+// var server = https.createServer(httpsOption, app)
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -28,6 +34,8 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+// servers.listen(4430);
+// servers.on('error', onError);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -40,7 +48,6 @@ function normalizePort(val) {
     // named pipe
     return val;
   }
-
   if (port >= 0) {
     // port number
     return port;
@@ -57,7 +64,6 @@ function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
-
   var bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;
@@ -76,11 +82,9 @@ function onError(error) {
       throw error;
   }
 }
-
 /**
  * Event listener for HTTP server "listening" event.
  */
-
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
