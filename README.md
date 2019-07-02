@@ -1,4 +1,4 @@
-使用expre+element-ui搭建的一个小说下载管理系统
+使用express+element-ui搭建的一个小说下载管理系统
 ----
 
 使用node构建后台管理系统,其中project文件夹是使用element-ui搭建的前端页面.routine文件夹是node请求接口
